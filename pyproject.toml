@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "xo1"
+version = "0.1.0"
+description = "EAF-based framework for creating terminal applications"
+authors = ["Pavel Kulyov <kulyov.pavel@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+
+repository = "https://github.com/pkulev/xo1"
+homepage = "https://github.com/pkulev/xo1"
+
+keywords = ["curses", "terminal", "application", "framework"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: Console :: Curses",
+    "License :: OSI Approved :: MIT License",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+eaf = "^0.1.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.1"
+pytest-pylint = "^0.16.1"
+codecov = "^2.0.22"
+black = "^19.10b0"
+pytest-coverage = "^0.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
