@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "xo1"
-version = "0.1.0"
+version = "0.1.1"
 description = "EAF-based framework for creating terminal applications"
 authors = ["Pavel Kulyov <kulyov.pavel@gmail.com>"]
 license = "MIT"
