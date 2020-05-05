@@ -18,8 +18,6 @@ class Application(eaf.app.Application):
 
         super().__init__(renderer, window)
 
-        # TODO:
-        # self._clock = get_clock()
         self._palette = palette or Palette()
         self._palette.init_colors()
 
