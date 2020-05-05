@@ -12,7 +12,9 @@ from xo1.render import Renderer
 class Application(eaf.app.Application):
     """Curses-powered application class."""
 
-    def __init__(self, x, y, palette: Optional[Palette] = None):
+    def __init__(
+        self, x, y, palette: Optional[Palette] = None, title: str = "xo1 application"
+    ):
         window = create_window(x, y, init=True)
         renderer = Renderer(window)
 
@@ -21,11 +23,19 @@ class Application(eaf.app.Application):
         self._palette = palette or Palette()
         self._palette.init_colors()
 
-    def set_caption(self, caption: str = "xo1 application", icontitle: str = ""):
-        """Set window caption."""
+        self.set_caption(title)
 
-        # FIXME: Maybe we can update text via terminal API
-        pass
+    def set_caption(self, caption):
+        """Set window caption.
+
+        This is very hacky workaround, curses doesn't know that terminal state
+        changed. Not all terminals support this.
+
+        .. NOTE:: application doesn't revert title back, maybe later will be
+                  implemented.
+        """
+
+        print(f"\x1b]0;{caption}\x07")
 
     def stop(self):
         self._ioloop.add_callback(lambda: deinit_window(self.renderer.screen))
