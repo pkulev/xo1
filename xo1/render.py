@@ -40,8 +40,6 @@ class Renderer(eaf.Renderer):
                         (cpos.x >= border.x - 1 or cpos.y >= border.y - 1)
                         or (cpos.x <= 0 or cpos.y <= 0)
                     ) and not obj.draw_on_border:
-                        # TODO: remove
-                        obj.remove_obsolete(gpos)
                         continue
 
                     if image in self.INVISIBLE_SYMBOLS:
