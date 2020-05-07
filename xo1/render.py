@@ -7,6 +7,14 @@ import eaf
 from eaf.core import Vec3
 
 
+class Renderable(eaf.Renderable):
+    """Curses Renderable implementation."""
+
+    # Allow or not drawing on border. Most of the time you probably want to
+    # draw on border only some user interface widgets.
+    draw_on_border = False
+
+
 class Renderer(eaf.Renderer):
     """Curses renderer implementation."""
 
