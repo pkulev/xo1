@@ -37,8 +37,22 @@ class Application(eaf.app.Application):
 
         print(f"\x1b]0;{caption}\x07")
 
+    def tick(self):
+        """Handle `Ctrl C` gracefully."""
+
+        try:
+            super().tick()
+        except KeyboardInterrupt:
+            self.stop()
+
     def stop(self):
-        self._ioloop.add_callback(lambda: deinit_window(self.renderer.screen))
+        """Return terminal state back."""
+
+        def deinit_curses():
+            self.renderer.clear()
+            deinit_window(self.renderer.screen)
+
+        self._ioloop.add_callback(deinit_curses)
         super().stop()
 
     @property
