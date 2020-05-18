@@ -2,7 +2,7 @@
 
 import curses
 
-from typing import List
+from typing import List, Optional
 
 from eaf.errors import Error
 
@@ -13,6 +13,11 @@ class PairAlreadyRegistered(Error):
             f"Pair with {attr} = {value} already registered."
             " You can use force=True to redefine it."
         )
+
+
+class InvalidPaletteEntry(Error):
+    def __init__(self, entry):
+        super().__init__(f"Invalid palette entry: {entry}, must be 1-3 element tuple.")
 
 
 class Pair:
@@ -71,9 +76,30 @@ class Palette:
         self.palette = {}
 
         idx = 1
-        for name, fg, bg in palette or []:
+        for name, fg, bg in self._destructure(palette):
             self.add_pair(name, Pair(idx, fg, bg), init=False)
             idx += 1
+
+    @classmethod
+    def _destructure(cls, palette: Optional[List[tuple]]) -> List[tuple]:
+        """Apply _destructure_entry to the whole palette."""
+
+        for entry in palette or []:
+            yield cls._destructure_entry(entry)
+
+    @classmethod
+    def _destructure_entry(cls, entry: tuple) -> tuple:
+        """Validate incoming entry and return tuple with defaults on missing."""
+        if len(entry) == 1:
+            name, fg, bg = entry + (cls.COLOR_DEFAULT, cls.COLOR_DEFAULT)
+        elif len(entry) == 2:
+            name, fg, bg = entry + (cls.COLOR_DEFAULT,)
+        elif len(entry) == 3:
+            name, fg, bg = entry
+        else:
+            raise InvalidPaletteEntry(entry)
+
+        return name, fg, bg
 
     def add_pair(self, name: str, pair: Pair, force: bool = False, init: bool = True):
         """Add new color pair. Use force to override name and idx."""
