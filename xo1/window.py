@@ -11,6 +11,8 @@ def create_window(
     if init:
         curses.initscr()
         curses.start_color()
+        if curses.has_colors():
+            curses.use_default_colors()
 
     screen = curses.newwin(y, x, begin_x, begin_y)
     screen.keypad(0)
