@@ -37,26 +37,23 @@ class Renderer(eaf.Renderer):
         # TODO: Move sorting to some kind of object manager
         # Must be sorted on adding objects
         for obj in sorted(objects, key=attrgetter("render_priority")):
-            gpos_list, data_gen = obj.get_render_data()
 
-            for data in data_gen:
-                for gpos in gpos_list:
-                    lpos, image, style = data
-                    cpos = (gpos + lpos)[int]
+            if obj.image is None:
+                continue
 
-                    if (
-                        (cpos.x >= border.x - 1 or cpos.y >= border.y - 1)
-                        or (cpos.x <= 0 or cpos.y <= 0)
-                    ) and not obj.draw_on_border:
-                        continue
+            for textel in obj.image:
+                pos = (obj.pos + textel.pos)[int]
 
-                    if image in self.INVISIBLE_SYMBOLS:
-                        continue
+                if (
+                    (pos.x >= border.x - 1 or pos.y >= border.y - 1)
+                    or (pos.x <= 0 or pos.y <= 0)
+                ) and not obj.draw_on_border:
+                    continue
 
-                    if style:
-                        self.screen.addstr(cpos.y, cpos.x, image, style)
-                    else:
-                        self.screen.addstr(cpos.y, cpos.x, image)
+                if textel.char in self.INVISIBLE_SYMBOLS:
+                    continue
+
+                self.screen.addstr(pos.y, pos.x, textel.char, textel.attr)
 
     def present(self):
         self.screen.refresh()
