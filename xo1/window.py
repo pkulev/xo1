@@ -15,8 +15,8 @@ def create_window(
             curses.use_default_colors()
 
     screen = curses.newwin(y, x, begin_x, begin_y)
-    screen.keypad(0)
-    screen.nodelay(1)
+    screen.keypad(False)
+    screen.nodelay(True)
 
     if init:
         curses.noecho()
@@ -33,8 +33,8 @@ def create_window(
 def deinit_window(screen, deinit: bool = True):
     """Destroy window, deinit curses, make console changes back."""
 
-    screen.nodelay(0)
-    screen.keypad(0)
+    screen.nodelay(False)
+    screen.keypad(False)
 
     if deinit:
         curses.nocbreak()
