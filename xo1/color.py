@@ -2,7 +2,7 @@
 
 import curses
 
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from eaf.errors import Error
 
@@ -125,5 +125,17 @@ class Palette:
     def pair_names(self) -> List[str]:
         return sorted(self.palette, key=lambda it: self[it].idx)
 
-    def __getattr__(self, name: str) -> int:
-        return self.palette[name].idx
+    def __getattr__(self, name: Union[str, int]) -> int:
+
+        # we suppose that it's already curses value
+        if isinstance(name, int):
+            return name
+
+        # FIXME: register default pair
+        if name == "default":
+            return curses.color_pair(0)
+
+        return curses.color_pair(self.palette[name].idx)
+
+    def __getitem__(self, name: Union[str, int]) -> int:
+        return self.__getattr__(name)
