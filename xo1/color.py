@@ -59,7 +59,13 @@ class Palette:
     COLOR_WHITE = curses.COLOR_WHITE
     COLOR_YELLOW = curses.COLOR_YELLOW
 
+    COLOR_DEFAULT = -1
+
+    A_NORMAL = curses.A_NORMAL
     A_BOLD = curses.A_BOLD
+    A_BLINK = curses.A_BLINK
+    A_REVERSE = curses.A_REVERSE
+    A_STANDOUT = curses.A_STANDOUT
 
     def __init__(self, palette=None):
         self.palette = {}
