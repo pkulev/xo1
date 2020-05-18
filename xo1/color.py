@@ -72,8 +72,9 @@ class Palette:
     A_REVERSE = curses.A_REVERSE
     A_STANDOUT = curses.A_STANDOUT
 
-    def __init__(self, palette=None):
+    def __init__(self, palette=None, attr_map=None):
         self.palette = {}
+        self.attr_map = attr_map or {}
 
         idx = 1
         for name, fg, bg in self._destructure(palette):
@@ -139,3 +140,11 @@ class Palette:
 
     def __getitem__(self, name: Union[str, int]) -> int:
         return self.__getattr__(name)
+
+    def decode_attr(self, key, default=A_NORMAL):
+        """Return attr by code."""
+
+        if isinstance(key, int):
+            return key
+
+        return self.attr_map.get(key, default)
