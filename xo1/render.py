@@ -57,7 +57,7 @@ class Renderer(eaf.Renderer):
         self.screen.refresh()
 
     def get_width(self):
-        return self.screen.getmaxyx()[0]
+        return self.screen.getmaxyx()[1]
 
     def get_height(self):
-        return self.screen.getmaxyx()[1]
+        return self.screen.getmaxyx()[0]
