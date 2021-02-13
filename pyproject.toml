@@ -21,7 +21,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-eaf = "^0.2.2"
+eaf = "^0.2.3"
 toml = "^0.10.1"
 
 [tool.poetry.dev-dependencies]

@@ -34,9 +34,7 @@ class Renderer(eaf.Renderer):
         # Window border, rendering behind it will cause curses.error
         border = Vec3(*self.screen.getmaxyx()[::-1])
 
-        # TODO: Move sorting to some kind of object manager
-        # Must be sorted on adding objects
-        for obj in sorted(objects, key=attrgetter("render_priority")):
+        for obj in objects:
 
             if obj.image is None:
                 continue
