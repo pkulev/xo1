@@ -1,16 +1,17 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "xo1"
 version = "0.2.0"
 description = "EAF-based framework for creating terminal applications"
-authors = ["Pavel Kulyov <kulyov.pavel@gmail.com>"]
-license = "MIT"
+authors = [
+    {name = "Pavel Kulyov", email = "kulyov.pavel@gmail.com"},
+]
+license = {text = "MIT"}
 readme = "README.rst"
-
-repository = "https://github.com/pkulev/xo1"
-homepage = "https://github.com/pkulev/xo1"
-
 keywords = ["curses", "terminal", "application", "framework"]
-
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -19,18 +20,79 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.7"
-eaf = "^0.2.2"
-toml = "^0.10.1"
+requires-python = ">=3.10"
+dependencies = [
+    "eaf==0.2.2",
+    "toml==0.10.2",
+    "windows-curses==2.4.0; platform_system=='Windows'",
+]
 
-[tool.poetry.dev-dependencies]
-pytest = "^5.4.1"
-pytest-pylint = "^0.16.1"
-codecov = "^2.0.22"
-black = "^19.10b0"
-pytest-coverage = "^0.0"
+[project.urls]
+repository = "https://github.com/pkulev/xo1"
+homepage = "https://github.com/pkulev/xo1"
 
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+dev = [
+    "mypy==1.13.0",
+    "poethepoet==0.31.1",
+    "pytest-coverage",
+    "pytest==8.3.3",
+    "ruff==0.8.0",
+]
+
+[tool.poe.tasks.format]
+help = "Format all the code. You can add '--diff' or '--check' also."
+cmd = "ruff format"
+
+[tool.poe.tasks.lint]
+help = "Lint all the code."
+cmd = "ruff check"
+
+[tool.poe.tasks.typecheck]
+help = "Typecheck all the code."
+cmd = "mypy xo1"
+
+[tool.poe.tasks.test]
+help = "Run unit tests."
+cmd = "pytest --strict-markers -vvv tests/"
+
+[tool.poe.tasks.ci]
+help = "Run full CI sequence."
+sequence = [
+  "format",
+  "lint",
+  "typecheck",
+  "test",
+]
+ignore_fail = true  # TODO: drop after all lint errors being fixed
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "YTT", "ANN", "S", "B"]
+ignore = [
+    "ANN002",  # Missing type annotation for `*args`.
+    "ANN003",  # Missing type annotation for `**kwargs`.
+    "N818",    # Exceptions must contain Error in the name.
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "S101",
+    "ANN001",
+    "ANN002",
+    "ANN003",
+    "ANN201",
+    "ANN202",
+    "ANN204",
+    "ANN205",
+]
+
+[tool.mypy]
+strict = true
+pretty = true
+implicit_reexport = true

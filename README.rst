@@ -9,7 +9,7 @@ Python framework for creating terminal applications.
 Requirements
 ============
 
-* >=python-3.7
+* >=python-3.10
 * >=eaf-0.2
 
 Installation
@@ -28,20 +28,22 @@ Installation
 
 .. code-block:: console
 
-   $ poetry install
+   $ uv sync --extras dev
 
 Testing
 -------
 
 .. code-block:: console
 
-   $ poetry run pytest -s -v tests/  # run all tests
-   $ poetry run pytest --cov=xo1 -s -v tests/  # run all tests with coverage
-   $ poetry run black xo1/ tests/  # autoformat code
+   $ uv run poe ci  # Run all the checks.
+
+   # Or run them separately.
+   $ uv run poe test
+   $ uv run poe format
    $ # run type checking
-   $ poetry run pytest --mypy --mypy-ignore-missing-imports -s -v xo1/ tests/
+   $ uv run poe typecheck
    $ # run code linting
-   $ poetry run pytest --pylint -s -v xo1/ tests/
+   $ uv run poe lint
 
 Documentation
 -------------
