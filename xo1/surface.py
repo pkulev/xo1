@@ -1,15 +1,14 @@
 """Text image definitions and manipulation routines."""
 
-import curses
+from __future__ import annotations
 
+from collections.abc import Generator
 from dataclasses import dataclass
 from itertools import zip_longest
-from typing import List, Optional
+from typing import NoReturn
 
 import eaf
 import toml
-
-from xo1.color import Pair, Palette
 
 
 @dataclass
@@ -21,7 +20,7 @@ class Textel:
 
     char: str
     color: str
-    attrs: List[str]
+    attrs: list[str]
     pos: eaf.Vec3 = None
 
     @property
@@ -63,21 +62,21 @@ class Surface(eaf.Image):
         Has minimum set of validations.
         """
 
-        image: List[str]
-        color: List[str]
-        attr: List[List[str]]
+        image: list[str]
+        color: list[str]
+        attr: list[list[str]]
 
-        def __post_init__(self):
+        def __post_init__(self) -> None:
             self.color = self.color or []
             self.attr = self.attr or []
 
     class Malformed(Exception):
-        def __init__(self, name, reason):
+        def __init__(self, name: str, reason: str) -> None:
             super().__init__(f"Surface '{name}' malformed: {reason}.")
 
     __slots__ = ["_image", "_width", "_height", "_name"]
 
-    def __init__(self, image, color=None, attr=None, name="untitled"):
+    def __init__(self, image, color=None, attr=None, name: str = "untitled") -> None:
         self._name = name
 
         self.check_image(image)
@@ -89,17 +88,19 @@ class Surface(eaf.Image):
 
         self._image = [
             [
-                Textel(char, color, attr,)
-                for char, color, attr in zip_longest(
-                    char_row, color_row or [], attr_row or []
+                Textel(
+                    char,
+                    color,
+                    attr,
                 )
+                for char, color, attr in zip_longest(char_row, color_row or [], attr_row or [])
             ]
             for char_row, color_row, attr_row in zip_longest(
                 self.raw.image, self.raw.color, self.raw.attr
             )
         ]
 
-    def check_image(self, image):
+    def check_image(self, image) -> None:
         """Check image."""
 
         widths = list(map(len, image))
@@ -108,13 +109,13 @@ class Surface(eaf.Image):
                 raise Surface.Malformed(self.name, "line widths must be equal")
 
     @classmethod
-    def from_file(cls, filename: str):
+    def from_file(cls, filename: str) -> Surface:
         tex = TomlFile.load(filename)
 
         return cls(tex.raw.image, tex.raw.color, tex.raw.attr, tex.name)
 
     @property
-    def raw(self):
+    def raw(self) -> Raw:
         """Raw surface data."""
 
         return self._raw
@@ -126,23 +127,15 @@ class Surface(eaf.Image):
         return self._image
 
     @property
-    def height(self):
-        """Height of the surface.
+    def height(self) -> int:
+        """Height of the surface."""
 
-        :getter: yes
-        :setter: no
-        :type: integer
-        """
         return self._height
 
     @property
-    def width(self):
-        """Width of the surface.
+    def width(self) -> int:
+        """Width of the surface."""
 
-        :getter: yes
-        :setter: no
-        :type: integer
-        """
         return self._width
 
     @property
@@ -152,10 +145,9 @@ class Surface(eaf.Image):
         return self._name
 
     def __iter__(self):
-
         return next(self)
 
-    def __next__(self):
+    def __next__(self) -> Generator[Textel]:
         for y, row in enumerate(self.image):
             for x, textel in enumerate(row):
                 textel.pos = eaf.Vec3(x, y)
@@ -171,37 +163,33 @@ class TomlFile:
     def __init__(
         self,
         raw_surface_data: Surface.Raw,
-        name: Optional[str] = None,
-        filename: Optional[str] = None,
-    ):
+        name: str | None = None,
+        filename: str | None = None,
+    ) -> None:
         self.raw = raw_surface_data
         self.name = name
         self.filename = filename
 
         if not isinstance(self.raw.image, list):
-            raise Surface.Malformed(
-                self.filename, "image layer must be list of strings"
-            )
+            raise Surface.Malformed(self.filename, "image layer must be list of strings")
 
         if not isinstance(self.raw.color, list):
-            raise Surface.Malformed(
-                self.filename, "color layer must be list of strings"
-            )
+            raise Surface.Malformed(self.filename, "color layer must be list of strings")
 
         if not isinstance(self.raw.attr, list):
             raise Surface.Malformed(self.filename, "attr layer must be list of strings")
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, object]:
         """Serialize Surface to dict."""
 
-        surface = {}
+        surface :dict[str, object] = {}
 
         if self.name:
             surface["meta"] = {
                 "name": self.name,
             }
 
-            surface["layers"]: {
+            surface["layers"] = {
                 "image": self.raw.image,
                 "color": self.raw.color,
                 "attr": self.raw.attr,
@@ -225,15 +213,15 @@ class TomlFile:
             ),
         )
 
-    def save_as(self, filename: str):
+    def save_as(self, filename: str) -> None:
         """Dump Surface into TOML file."""
 
         toml.dump(self.to_dict(), filename)
 
-    def save(self):
+    def save(self) -> NoReturn:
         """Save current file, if opened."""
 
         if self.filename:
             self.save_as(self.filename)
 
-        raise IOError("File name was not provided.")
+        raise OSError("File name was not provided.")

@@ -4,8 +4,12 @@ import curses
 
 
 def create_window(
-    x: int, y: int, begin_x: int = 0, begin_y: int = 0, init: bool = False
-):
+    x: int,
+    y: int,
+    begin_x: int = 0,
+    begin_y: int = 0,
+    init: bool = False,
+) -> curses.window:
     """Initialize curses, make and return window."""
 
     if init:
@@ -30,7 +34,7 @@ def create_window(
     return screen
 
 
-def deinit_window(screen, deinit: bool = True):
+def deinit_window(screen: curses.window, deinit: bool = True) -> None:
     """Destroy window, deinit curses, make console changes back."""
 
     screen.nodelay(False)

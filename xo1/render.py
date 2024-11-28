@@ -3,7 +3,6 @@
 from operator import attrgetter
 
 import eaf
-
 from eaf.core import Vec3
 
 
@@ -21,14 +20,14 @@ class Renderer(eaf.Renderer):
     INVISIBLE_SYMBOLS = " "
     """Symbols that renderer must not render on the screen."""
 
-    def __init__(self, screen):
+    def __init__(self, screen) -> None:
         super().__init__(screen)
 
-    def clear(self):
+    def clear(self) -> None:
         self.screen.erase()
         self.screen.border(0)
 
-    def render_objects(self, objects):
+    def render_objects(self, objects: list[Renderable]) -> None:
         """Render all renderable objects."""
 
         # Window border, rendering behind it will cause curses.error
@@ -37,7 +36,6 @@ class Renderer(eaf.Renderer):
         # TODO: Move sorting to some kind of object manager
         # Must be sorted on adding objects
         for obj in sorted(objects, key=attrgetter("render_priority")):
-
             if obj.image is None:
                 continue
 
@@ -45,8 +43,7 @@ class Renderer(eaf.Renderer):
                 pos = (obj.pos + textel.pos)[int]
 
                 if (
-                    (pos.x >= border.x - 1 or pos.y >= border.y - 1)
-                    or (pos.x <= 0 or pos.y <= 0)
+                    (pos.x >= border.x - 1 or pos.y >= border.y - 1) or (pos.x <= 0 or pos.y <= 0)
                 ) and not obj.draw_on_border:
                     continue
 
@@ -55,11 +52,11 @@ class Renderer(eaf.Renderer):
 
                 self.screen.addstr(pos.y, pos.x, textel.char, textel.attr)
 
-    def present(self):
+    def present(self) -> None:
         self.screen.refresh()
 
-    def get_width(self):
+    def get_width(self) -> int:
         return self.screen.getmaxyx()[0]
 
-    def get_height(self):
+    def get_height(self) -> int:
         return self.screen.getmaxyx()[1]

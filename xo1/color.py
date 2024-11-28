@@ -1,14 +1,13 @@
 """Curses color manipulation objects."""
 
 import curses
-
-from typing import List, Optional, Union
+from collections.abc import Generator
 
 from eaf.errors import Error
 
 
 class PairAlreadyRegistered(Error):
-    def __init__(self, attr, value):
+    def __init__(self, attr: str, value: object) -> None:
         super().__init__(
             f"Pair with {attr} = {value} already registered."
             " You can use force=True to redefine it."
@@ -16,20 +15,20 @@ class PairAlreadyRegistered(Error):
 
 
 class InvalidPaletteEntry(Error):
-    def __init__(self, entry):
+    def __init__(self, entry: object) -> None:
         super().__init__(f"Invalid palette entry: {entry}, must be 1-3 element tuple.")
 
 
 class Pair:
     """Color pair representation."""
 
-    def __init__(self, idx, fg, bg, attrs=None):
+    def __init__(self, idx: int, fg: int, bg: int, attrs: None = None) -> None:
         self.idx = idx
         self.bg = bg
         self.fg = fg
         self.attrs = attrs
 
-    def init(self):
+    def init(self) -> None:
         """Init curses color pair.
 
         Does nothing if terminal doesn't support colors.
@@ -72,7 +71,11 @@ class Palette:
     A_REVERSE = curses.A_REVERSE
     A_STANDOUT = curses.A_STANDOUT
 
-    def __init__(self, palette=None, attr_map=None):
+    def __init__(
+        self,
+        palette: dict | None = None,
+        attr_map: dict | None = None,
+    ) -> None:
         self.palette = {}
         self.attr_map = attr_map or {}
 
@@ -82,19 +85,21 @@ class Palette:
             idx += 1
 
     @classmethod
-    def _destructure(cls, palette: Optional[List[tuple]]) -> List[tuple]:
+    def _destructure(
+        cls, palette: list[tuple[str | int]] | None
+    ) -> Generator[tuple[str, int, int]]:
         """Apply _destructure_entry to the whole palette."""
 
         for entry in palette or []:
             yield cls._destructure_entry(entry)
 
     @classmethod
-    def _destructure_entry(cls, entry: tuple) -> tuple:
+    def _destructure_entry(cls, entry: tuple[int]) -> tuple[str, int, int]:
         """Validate incoming entry and return tuple with defaults on missing."""
         if len(entry) == 1:
-            name, fg, bg = entry + (cls.COLOR_DEFAULT, cls.COLOR_DEFAULT)
+            name, fg, bg = (entry[0], cls.COLOR_DEFAULT, cls.COLOR_DEFAULT)
         elif len(entry) == 2:
-            name, fg, bg = entry + (cls.COLOR_DEFAULT,)
+            name, fg, bg = (entry[0], entry[1], cls.COLOR_DEFAULT)
         elif len(entry) == 3:
             name, fg, bg = entry
         else:
@@ -102,7 +107,7 @@ class Palette:
 
         return name, fg, bg
 
-    def add_pair(self, name: str, pair: Pair, force: bool = False, init: bool = True):
+    def add_pair(self, name: str, pair: Pair, force: bool = False, init: bool = True) -> None:
         """Add new color pair. Use force to override name and idx."""
 
         if name in self.palette and not force:
@@ -116,18 +121,17 @@ class Palette:
         if init:
             pair.init()
 
-    def init_colors(self):
+    def init_colors(self) -> None:
         """Init all color pairs."""
 
         for pair in self.palette.values():
             pair.init()
 
     @property
-    def pair_names(self) -> List[str]:
+    def pair_names(self) -> list[str]:
         return sorted(self.palette, key=lambda it: self[it].idx)
 
-    def __getattr__(self, name: Union[str, int]) -> int:
-
+    def __getattr__(self, name: str | int) -> int:
         # we suppose that it's already curses value
         if isinstance(name, int):
             return name
@@ -138,10 +142,10 @@ class Palette:
 
         return curses.color_pair(self.palette[name].idx)
 
-    def __getitem__(self, name: Union[str, int]) -> int:
+    def __getitem__(self, name: str | int) -> int:
         return self.__getattr__(name)
 
-    def decode_attr(self, key, default=A_NORMAL):
+    def decode_attr(self, key: int | str, default: int = A_NORMAL) -> int:
         """Return attr by code."""
 
         if isinstance(key, int):

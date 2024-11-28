@@ -5,6 +5,7 @@ from xo1.surface import (
     Textel,
 )
 
+
 IMAGE = r"""
     _
   =/ \=  
@@ -16,7 +17,6 @@ IMAGE = r"""
 
 
 def test_surface_negative():
-
     with pytest.raises(Surface.Malformed):
         Surface(["1", "12"])
 
@@ -31,5 +31,5 @@ def test_textel():
     textel = Textel("a", None, None)
 
     assert textel.char == "a"
-    assert textel.color == None
-    assert textel.attrs == None
+    assert textel.color is None
+    assert textel.attrs is None
